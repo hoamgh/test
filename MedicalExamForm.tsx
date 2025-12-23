@@ -24,7 +24,7 @@ function MedicalExamForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch('http://localhost:5000/api/medical-records', {
+      const response = await fetch('http://localhost:8000/api/medical-records', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -23,7 +23,7 @@ function AppointmentForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch('http://localhost:5000/api/appointments', {
+      const response = await fetch('http://localhost:8000/api/appointments', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -5,7 +5,7 @@ const Appointment = require('../models/Appointment');
 // GET all appointments
 router.get('/', async (req, res) => {
   try {
-    const appointments = await Appointment.find().sort({ date: -1 });
+    const appointments = await Appointment.findAll({ order: [['date', 'DESC']] });
     res.json(appointments);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -14,18 +14,16 @@ router.get('/', async (req, res) => {
 
 // POST create new appointment
 router.post('/', async (req, res) => {
-  const appointment = new Appointment({
-    petName: req.body.petName,
-    ownerName: req.body.ownerName,
-    phone: req.body.phone,
-    service: req.body.service,
-    date: req.body.date,
-    time: req.body.time,
-    notes: req.body.notes
-  });
-
   try {
-    const newAppointment = await appointment.save();
+    const newAppointment = await Appointment.create({
+      petName: req.body.petName,
+      ownerName: req.body.ownerName,
+      phone: req.body.phone,
+      service: req.body.service,
+      date: req.body.date,
+      time: req.body.time,
+      notes: req.body.notes
+    });
     res.status(201).json(newAppointment);
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -35,7 +33,7 @@ router.post('/', async (req, res) => {
 // GET appointment by ID
 router.get('/:id', async (req, res) => {
   try {
-    const appointment = await Appointment.findById(req.params.id);
+    const appointment = await Appointment.findByPk(req.params.id);
     if (!appointment) {
       return res.status(404).json({ message: 'Appointment not found' });
     }
@@ -48,22 +46,23 @@ router.get('/:id', async (req, res) => {
 // PUT update appointment
 router.put('/:id', async (req, res) => {
   try {
-    const appointment = await Appointment.findById(req.params.id);
+    const appointment = await Appointment.findByPk(req.params.id);
     if (!appointment) {
       return res.status(404).json({ message: 'Appointment not found' });
     }
 
-    if (req.body.petName) appointment.petName = req.body.petName;
-    if (req.body.ownerName) appointment.ownerName = req.body.ownerName;
-    if (req.body.phone) appointment.phone = req.body.phone;
-    if (req.body.service) appointment.service = req.body.service;
-    if (req.body.date) appointment.date = req.body.date;
-    if (req.body.time) appointment.time = req.body.time;
-    if (req.body.notes) appointment.notes = req.body.notes;
-    if (req.body.status) appointment.status = req.body.status;
+    await appointment.update({
+      petName: req.body.petName !== undefined ? req.body.petName : appointment.petName,
+      ownerName: req.body.ownerName !== undefined ? req.body.ownerName : appointment.ownerName,
+      phone: req.body.phone !== undefined ? req.body.phone : appointment.phone,
+      service: req.body.service !== undefined ? req.body.service : appointment.service,
+      date: req.body.date !== undefined ? req.body.date : appointment.date,
+      time: req.body.time !== undefined ? req.body.time : appointment.time,
+      notes: req.body.notes !== undefined ? req.body.notes : appointment.notes,
+      status: req.body.status !== undefined ? req.body.status : appointment.status
+    });
 
-    const updatedAppointment = await appointment.save();
-    res.json(updatedAppointment);
+    res.json(appointment);
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
@@ -72,11 +71,11 @@ router.put('/:id', async (req, res) => {
 // DELETE appointment
 router.delete('/:id', async (req, res) => {
   try {
-    const appointment = await Appointment.findById(req.params.id);
+    const appointment = await Appointment.findByPk(req.params.id);
     if (!appointment) {
       return res.status(404).json({ message: 'Appointment not found' });
     }
-    await appointment.remove();
+    await appointment.destroy();
     res.json({ message: 'Appointment deleted' });
   } catch (err) {
     res.status(500).json({ message: err.message });

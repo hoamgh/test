@@ -5,7 +5,7 @@ const Pet = require('../models/Pet');
 // GET all pets
 router.get('/', async (req, res) => {
   try {
-    const pets = await Pet.find().sort({ createdAt: -1 });
+    const pets = await Pet.findAll({ order: [['createdAt', 'DESC']] });
     res.json(pets);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -14,19 +14,17 @@ router.get('/', async (req, res) => {
 
 // POST create new pet
 router.post('/', async (req, res) => {
-  const pet = new Pet({
-    name: req.body.name,
-    type: req.body.type,
-    breed: req.body.breed,
-    age: req.body.age,
-    weight: req.body.weight,
-    ownerName: req.body.ownerName,
-    ownerPhone: req.body.ownerPhone,
-    ownerEmail: req.body.ownerEmail
-  });
-
   try {
-    const newPet = await pet.save();
+    const newPet = await Pet.create({
+      name: req.body.name,
+      type: req.body.type,
+      breed: req.body.breed,
+      age: req.body.age,
+      weight: req.body.weight,
+      ownerName: req.body.ownerName,
+      ownerPhone: req.body.ownerPhone,
+      ownerEmail: req.body.ownerEmail
+    });
     res.status(201).json(newPet);
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -36,7 +34,7 @@ router.post('/', async (req, res) => {
 // GET pet by ID
 router.get('/:id', async (req, res) => {
   try {
-    const pet = await Pet.findById(req.params.id);
+    const pet = await Pet.findByPk(req.params.id);
     if (!pet) {
       return res.status(404).json({ message: 'Pet not found' });
     }
@@ -49,22 +47,23 @@ router.get('/:id', async (req, res) => {
 // PUT update pet
 router.put('/:id', async (req, res) => {
   try {
-    const pet = await Pet.findById(req.params.id);
+    const pet = await Pet.findByPk(req.params.id);
     if (!pet) {
       return res.status(404).json({ message: 'Pet not found' });
     }
 
-    if (req.body.name) pet.name = req.body.name;
-    if (req.body.type) pet.type = req.body.type;
-    if (req.body.breed) pet.breed = req.body.breed;
-    if (req.body.age) pet.age = req.body.age;
-    if (req.body.weight) pet.weight = req.body.weight;
-    if (req.body.ownerName) pet.ownerName = req.body.ownerName;
-    if (req.body.ownerPhone) pet.ownerPhone = req.body.ownerPhone;
-    if (req.body.ownerEmail) pet.ownerEmail = req.body.ownerEmail;
+    await pet.update({
+      name: req.body.name !== undefined ? req.body.name : pet.name,
+      type: req.body.type !== undefined ? req.body.type : pet.type,
+      breed: req.body.breed !== undefined ? req.body.breed : pet.breed,
+      age: req.body.age !== undefined ? req.body.age : pet.age,
+      weight: req.body.weight !== undefined ? req.body.weight : pet.weight,
+      ownerName: req.body.ownerName !== undefined ? req.body.ownerName : pet.ownerName,
+      ownerPhone: req.body.ownerPhone !== undefined ? req.body.ownerPhone : pet.ownerPhone,
+      ownerEmail: req.body.ownerEmail !== undefined ? req.body.ownerEmail : pet.ownerEmail
+    });
 
-    const updatedPet = await pet.save();
-    res.json(updatedPet);
+    res.json(pet);
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
@@ -73,11 +72,11 @@ router.put('/:id', async (req, res) => {
 // DELETE pet
 router.delete('/:id', async (req, res) => {
   try {
-    const pet = await Pet.findById(req.params.id);
+    const pet = await Pet.findByPk(req.params.id);
     if (!pet) {
       return res.status(404).json({ message: 'Pet not found' });
     }
-    await pet.remove();
+    await pet.destroy();
     res.json({ message: 'Pet deleted' });
   } catch (err) {
     res.status(500).json({ message: err.message });

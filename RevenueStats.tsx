@@ -17,7 +17,7 @@ function RevenueStats() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/stats/revenue')
+        const response = await fetch('http://localhost:8000/api/stats/revenue')
         if (response.ok) {
           const data = await response.json()
           setStats(data)

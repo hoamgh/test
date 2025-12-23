@@ -1,65 +1,59 @@
-const mongoose = require('mongoose');
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/database');
 
-const invoiceSchema = new mongoose.Schema({
+const Invoice = sequelize.define('Invoice', {
+  id: {
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
+    primaryKey: true
+  },
   invoiceNumber: {
-    type: String,
-    required: true,
+    type: DataTypes.STRING,
+    allowNull: false,
     unique: true
   },
   customerName: {
-    type: String,
-    required: true
+    type: DataTypes.STRING,
+    allowNull: false
   },
   phone: {
-    type: String,
-    required: true
+    type: DataTypes.STRING,
+    allowNull: false
   },
   date: {
-    type: Date,
-    default: Date.now
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW
   },
-  items: [{
-    description: {
-      type: String,
-      required: true
-    },
-    quantity: {
-      type: Number,
-      required: true,
-      min: 1
-    },
-    unitPrice: {
-      type: Number,
-      required: true
-    },
-    total: {
-      type: Number,
-      required: true
-    }
-  }],
+  items: {
+    type: DataTypes.JSONB,
+    allowNull: false,
+    defaultValue: []
+  },
   subtotal: {
-    type: Number,
-    required: true
+    type: DataTypes.FLOAT,
+    allowNull: false
   },
   tax: {
-    type: Number,
-    required: true,
-    default: 0
+    type: DataTypes.FLOAT,
+    allowNull: false,
+    defaultValue: 0
   },
   total: {
-    type: Number,
-    required: true
+    type: DataTypes.FLOAT,
+    allowNull: false
   },
   notes: {
-    type: String
+    type: DataTypes.TEXT
   },
   status: {
-    type: String,
-    enum: ['pending', 'paid', 'cancelled'],
-    default: 'pending'
+    type: DataTypes.STRING,
+    validate: {
+      isIn: [['pending', 'paid', 'cancelled']]
+    },
+    defaultValue: 'pending'
   }
 }, {
   timestamps: true
 });
 
-module.exports = mongoose.model('Invoice', invoiceSchema);
+module.exports = Invoice;
