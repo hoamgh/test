@@ -14,11 +14,11 @@ router.get('/revenue', async (req, res) => {
 
     // Total revenue from sales
     const sales = await Sale.findAll();
-    const totalSalesRevenue = sales.reduce((sum, sale) => sum + parseFloat(sale.total), 0);
+    const totalSalesRevenue = sales.reduce((sum, sale) => sum + sale.total, 0);
 
     // Total revenue from invoices
     const invoices = await Invoice.findAll();
-    const totalInvoiceRevenue = invoices.reduce((sum, invoice) => sum + parseFloat(invoice.total), 0);
+    const totalInvoiceRevenue = invoices.reduce((sum, invoice) => sum + invoice.total, 0);
 
     const totalRevenue = totalSalesRevenue + totalInvoiceRevenue;
 
@@ -31,7 +31,7 @@ router.get('/revenue', async (req, res) => {
         }
       }
     });
-    const monthlyRevenue = monthlySales.reduce((sum, sale) => sum + parseFloat(sale.total), 0);
+    const monthlyRevenue = monthlySales.reduce((sum, sale) => sum + sale.total, 0);
 
     // Daily revenue (today)
     const today = new Date();
@@ -47,7 +47,7 @@ router.get('/revenue', async (req, res) => {
         }
       }
     });
-    const dailyRevenue = dailySales.reduce((sum, sale) => sum + parseFloat(sale.total), 0);
+    const dailyRevenue = dailySales.reduce((sum, sale) => sum + sale.total, 0);
 
     res.json({
       totalRevenue,
@@ -80,7 +80,7 @@ router.get('/top-services', async (req, res) => {
     const productRevenue = {};
 
     sales.forEach(sale => {
-      productRevenue[sale.productName] = (productRevenue[sale.productName] || 0) + parseFloat(sale.total);
+      productRevenue[sale.productName] = (productRevenue[sale.productName] || 0) + sale.total;
     });
 
     const topProducts = Object.entries(productRevenue)
@@ -117,7 +117,7 @@ router.get('/monthly-data', async (req, res) => {
         }
       });
 
-      const revenue = sales.reduce((sum, sale) => sum + parseFloat(sale.total), 0);
+      const revenue = sales.reduce((sum, sale) => sum + sale.total, 0);
 
       monthlyData.push({
         month: `Tháng ${month + 1}`,
