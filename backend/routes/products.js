@@ -21,7 +21,7 @@ router.post('/', async (req, res) => {
       price: req.body.price,
       stock: req.body.stock,
       description: req.body.description,
-      supplier: req.body.supplier
+      supplier: req.body.supplier || null
     });
     res.status(201).json(newProduct);
   } catch (err) {
