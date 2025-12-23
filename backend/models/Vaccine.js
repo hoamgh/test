@@ -1,35 +1,43 @@
-const mongoose = require('mongoose');
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/database');
 
-const vaccineSchema = new mongoose.Schema({
+const Vaccine = sequelize.define('Vaccine', {
+  id: {
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
+    primaryKey: true
+  },
   name: {
-    type: String,
-    required: true
+    type: DataTypes.STRING,
+    allowNull: false
   },
   type: {
-    type: String,
-    required: true,
-    enum: ['Bắt buộc', 'Khuyến nghị', 'Phòng ngừa']
+    type: DataTypes.STRING,
+    allowNull: false,
+    validate: {
+      isIn: [['Bắt buộc', 'Khuyến nghị', 'Phòng ngừa']]
+    }
   },
   price: {
-    type: Number,
-    required: true
+    type: DataTypes.FLOAT,
+    allowNull: false
   },
   stock: {
-    type: Number,
-    required: true,
-    default: 0
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    defaultValue: 0
   },
   description: {
-    type: String
+    type: DataTypes.TEXT
   },
   dosage: {
-    type: String
+    type: DataTypes.STRING
   },
   schedule: {
-    type: String
+    type: DataTypes.STRING
   }
 }, {
   timestamps: true
 });
 
-module.exports = mongoose.model('Vaccine', vaccineSchema);
+module.exports = Vaccine;

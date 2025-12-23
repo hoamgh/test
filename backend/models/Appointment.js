@@ -1,41 +1,51 @@
-const mongoose = require('mongoose');
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/database');
 
-const appointmentSchema = new mongoose.Schema({
+const Appointment = sequelize.define('Appointment', {
+  id: {
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
+    primaryKey: true
+  },
   petName: {
-    type: String,
-    required: true
+    type: DataTypes.STRING,
+    allowNull: false
   },
   ownerName: {
-    type: String,
-    required: true
+    type: DataTypes.STRING,
+    allowNull: false
   },
   phone: {
-    type: String,
-    required: true
+    type: DataTypes.STRING,
+    allowNull: false
   },
   service: {
-    type: String,
-    required: true,
-    enum: ['grooming', 'vet', 'vaccination', 'medical']
+    type: DataTypes.STRING,
+    allowNull: false,
+    validate: {
+      isIn: [['grooming', 'vet', 'vaccination', 'medical']]
+    }
   },
   date: {
-    type: Date,
-    required: true
+    type: DataTypes.DATE,
+    allowNull: false
   },
   time: {
-    type: String,
-    required: true
+    type: DataTypes.STRING,
+    allowNull: false
   },
   notes: {
-    type: String
+    type: DataTypes.TEXT
   },
   status: {
-    type: String,
-    enum: ['pending', 'confirmed', 'completed', 'cancelled'],
-    default: 'pending'
+    type: DataTypes.STRING,
+    validate: {
+      isIn: [['pending', 'confirmed', 'completed', 'cancelled']]
+    },
+    defaultValue: 'pending'
   }
 }, {
   timestamps: true
 });
 
-module.exports = mongoose.model('Appointment', appointmentSchema);
+module.exports = Appointment;

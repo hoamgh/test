@@ -5,7 +5,7 @@ const MedicalRecord = require('../models/MedicalRecord');
 // GET all medical records
 router.get('/', async (req, res) => {
   try {
-    const records = await MedicalRecord.find().sort({ createdAt: -1 });
+    const records = await MedicalRecord.findAll({ order: [['createdAt', 'DESC']] });
     res.json(records);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -14,20 +14,18 @@ router.get('/', async (req, res) => {
 
 // POST create new medical record
 router.post('/', async (req, res) => {
-  const record = new MedicalRecord({
-    petName: req.body.petName,
-    ownerName: req.body.ownerName,
-    symptoms: req.body.symptoms,
-    diagnosis: req.body.diagnosis,
-    treatment: req.body.treatment,
-    medications: req.body.medications,
-    notes: req.body.notes,
-    followUpDate: req.body.followUpDate,
-    veterinarian: req.body.veterinarian
-  });
-
   try {
-    const newRecord = await record.save();
+    const newRecord = await MedicalRecord.create({
+      petName: req.body.petName,
+      ownerName: req.body.ownerName,
+      symptoms: req.body.symptoms,
+      diagnosis: req.body.diagnosis,
+      treatment: req.body.treatment,
+      medications: req.body.medications,
+      notes: req.body.notes,
+      followUpDate: req.body.followUpDate,
+      veterinarian: req.body.veterinarian
+    });
     res.status(201).json(newRecord);
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -37,7 +35,7 @@ router.post('/', async (req, res) => {
 // GET medical record by ID
 router.get('/:id', async (req, res) => {
   try {
-    const record = await MedicalRecord.findById(req.params.id);
+    const record = await MedicalRecord.findByPk(req.params.id);
     if (!record) {
       return res.status(404).json({ message: 'Medical record not found' });
     }
@@ -50,23 +48,24 @@ router.get('/:id', async (req, res) => {
 // PUT update medical record
 router.put('/:id', async (req, res) => {
   try {
-    const record = await MedicalRecord.findById(req.params.id);
+    const record = await MedicalRecord.findByPk(req.params.id);
     if (!record) {
       return res.status(404).json({ message: 'Medical record not found' });
     }
 
-    if (req.body.petName) record.petName = req.body.petName;
-    if (req.body.ownerName) record.ownerName = req.body.ownerName;
-    if (req.body.symptoms) record.symptoms = req.body.symptoms;
-    if (req.body.diagnosis) record.diagnosis = req.body.diagnosis;
-    if (req.body.treatment) record.treatment = req.body.treatment;
-    if (req.body.medications) record.medications = req.body.medications;
-    if (req.body.notes) record.notes = req.body.notes;
-    if (req.body.followUpDate) record.followUpDate = req.body.followUpDate;
-    if (req.body.veterinarian) record.veterinarian = req.body.veterinarian;
+    await record.update({
+      petName: req.body.petName !== undefined ? req.body.petName : record.petName,
+      ownerName: req.body.ownerName !== undefined ? req.body.ownerName : record.ownerName,
+      symptoms: req.body.symptoms !== undefined ? req.body.symptoms : record.symptoms,
+      diagnosis: req.body.diagnosis !== undefined ? req.body.diagnosis : record.diagnosis,
+      treatment: req.body.treatment !== undefined ? req.body.treatment : record.treatment,
+      medications: req.body.medications !== undefined ? req.body.medications : record.medications,
+      notes: req.body.notes !== undefined ? req.body.notes : record.notes,
+      followUpDate: req.body.followUpDate !== undefined ? req.body.followUpDate : record.followUpDate,
+      veterinarian: req.body.veterinarian !== undefined ? req.body.veterinarian : record.veterinarian
+    });
 
-    const updatedRecord = await record.save();
-    res.json(updatedRecord);
+    res.json(record);
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
@@ -75,11 +74,11 @@ router.put('/:id', async (req, res) => {
 // DELETE medical record
 router.delete('/:id', async (req, res) => {
   try {
-    const record = await MedicalRecord.findById(req.params.id);
+    const record = await MedicalRecord.findByPk(req.params.id);
     if (!record) {
       return res.status(404).json({ message: 'Medical record not found' });
     }
-    await record.remove();
+    await record.destroy();
     res.json({ message: 'Medical record deleted' });
   } catch (err) {
     res.status(500).json({ message: err.message });

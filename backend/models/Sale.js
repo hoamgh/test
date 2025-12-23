@@ -1,37 +1,45 @@
-const mongoose = require('mongoose');
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/database');
 
-const saleSchema = new mongoose.Schema({
+const Sale = sequelize.define('Sale', {
+  id: {
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
+    primaryKey: true
+  },
   customerName: {
-    type: String,
-    required: true
+    type: DataTypes.STRING,
+    allowNull: false
   },
   phone: {
-    type: String,
-    required: true
+    type: DataTypes.STRING,
+    allowNull: false
   },
   productName: {
-    type: String,
-    required: true
+    type: DataTypes.STRING,
+    allowNull: false
   },
   quantity: {
-    type: Number,
-    required: true,
-    min: 1
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    validate: {
+      min: 1
+    }
   },
   unitPrice: {
-    type: Number,
-    required: true
+    type: DataTypes.FLOAT,
+    allowNull: false
   },
   total: {
-    type: Number,
-    required: true
+    type: DataTypes.FLOAT,
+    allowNull: false
   },
   date: {
-    type: Date,
-    default: Date.now
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW
   }
 }, {
   timestamps: true
 });
 
-module.exports = mongoose.model('Sale', saleSchema);
+module.exports = Sale;

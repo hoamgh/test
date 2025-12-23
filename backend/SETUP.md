@@ -1,8 +1,9 @@
-# Hướng dẫn chạy Backend PetCarx
+# Hướng dẫn chạy Backend PetCarx với PostgreSQL (Neon)
 
-## Bước 1: Cài đặt MongoDB
-1. Tải và cài đặt MongoDB từ https://www.mongodb.com/
-2. Khởi động MongoDB service
+## Bước 1: Tạo database trên Neon
+1. Đăng ký tài khoản tại https://neon.tech/
+2. Tạo một project mới
+3. Copy DATABASE_URL từ dashboard
 
 ## Bước 2: Cài đặt dependencies
 ```bash
@@ -13,22 +14,27 @@ npm install
 ## Bước 3: Cấu hình environment
 Tạo file `.env` trong thư mục backend:
 ```env
-MONGODB_URI=mongodb://localhost:27017/petcarx
-PORT=5000
-JWT_SECRET=your_secret_key
+DATABASE_URL=postgresql://neondb_owner:npg_VLtCB7Ne6cir@ep-calm-glade-a1f892io-pooler.ap-southeast-1.aws.neon.tech/PetCareX
+FRONTEND_URL=http://localhost:3000
+BACKEND_PORT=8000
 ```
 
-## Bước 4: Seed dữ liệu mẫu
+## Bước 4: Khởi tạo database (tạo tables)
 ```bash
-node seed.js
+node migrations/init-database.js
 ```
 
-## Bước 5: Chạy server
+## Bước 5: Seed dữ liệu mẫu
+```bash
+node seed-postgres.js
+```
+
+## Bước 6: Chạy server
 ```bash
 npm run dev
 ```
 
-Backend sẽ chạy trên http://localhost:5000
+Backend sẽ chạy trên http://localhost:8000
 
 ## API Endpoints chính:
 - `/api/appointments` - Quản lý lịch hẹn
@@ -42,13 +48,13 @@ Backend sẽ chạy trên http://localhost:5000
 - `/api/vaccines` - Quản lý vaccine
 
 ## Frontend Integration
-Cập nhật frontend để gọi API thay vì dùng mock data. Ví dụ trong AppointmentForm:
+Frontend đã được cập nhật để gọi API từ port 8000. Ví dụ trong AppointmentForm:
 
 ```javascript
 const handleSubmit = async (e) => {
   e.preventDefault();
   try {
-    const response = await fetch('http://localhost:5000/api/appointments', {
+    const response = await fetch('http://localhost:8000/api/appointments', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(formData)
@@ -62,3 +68,9 @@ const handleSubmit = async (e) => {
   }
 };
 ```
+
+## Lưu ý:
+- Database sử dụng PostgreSQL trên Neon với SSL
+- Tất cả models sử dụng UUID làm primary key
+- Timestamps (createdAt, updatedAt) được tự động quản lý bởi Sequelize
+- CORS đã được cấu hình để cho phép frontend:3000 kết nối backend:8000

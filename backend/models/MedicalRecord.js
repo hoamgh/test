@@ -1,41 +1,47 @@
-const mongoose = require('mongoose');
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/database');
 
-const medicalRecordSchema = new mongoose.Schema({
+const MedicalRecord = sequelize.define('MedicalRecord', {
+  id: {
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
+    primaryKey: true
+  },
   petName: {
-    type: String,
-    required: true
+    type: DataTypes.STRING,
+    allowNull: false
   },
   ownerName: {
-    type: String,
-    required: true
+    type: DataTypes.STRING,
+    allowNull: false
   },
   symptoms: {
-    type: String,
-    required: true
+    type: DataTypes.TEXT,
+    allowNull: false
   },
   diagnosis: {
-    type: String,
-    required: true
+    type: DataTypes.TEXT,
+    allowNull: false
   },
   treatment: {
-    type: String,
-    required: true
+    type: DataTypes.TEXT,
+    allowNull: false
   },
   medications: {
-    type: String
+    type: DataTypes.TEXT
   },
   notes: {
-    type: String
+    type: DataTypes.TEXT
   },
   followUpDate: {
-    type: Date
+    type: DataTypes.DATE
   },
   veterinarian: {
-    type: String,
-    default: 'Dr. PetCarx'
+    type: DataTypes.STRING,
+    defaultValue: 'Dr. PetCarx'
   }
 }, {
   timestamps: true
 });
 
-module.exports = mongoose.model('MedicalRecord', medicalRecordSchema);
+module.exports = MedicalRecord;

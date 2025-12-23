@@ -5,7 +5,7 @@ const Customer = require('../models/Customer');
 // GET all customers
 router.get('/', async (req, res) => {
   try {
-    const customers = await Customer.find().populate('pets').sort({ createdAt: -1 });
+    const customers = await Customer.findAll({ order: [['createdAt', 'DESC']] });
     res.json(customers);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -14,16 +14,13 @@ router.get('/', async (req, res) => {
 
 // POST create new customer
 router.post('/', async (req, res) => {
-  const customer = new Customer({
-    name: req.body.name,
-    phone: req.body.phone,
-    email: req.body.email,
-    address: req.body.address,
-    pets: req.body.pets || []
-  });
-
   try {
-    const newCustomer = await customer.save();
+    const newCustomer = await Customer.create({
+      name: req.body.name,
+      phone: req.body.phone,
+      email: req.body.email,
+      address: req.body.address
+    });
     res.status(201).json(newCustomer);
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -33,7 +30,7 @@ router.post('/', async (req, res) => {
 // GET customer by ID
 router.get('/:id', async (req, res) => {
   try {
-    const customer = await Customer.findById(req.params.id).populate('pets');
+    const customer = await Customer.findByPk(req.params.id);
     if (!customer) {
       return res.status(404).json({ message: 'Customer not found' });
     }
@@ -46,19 +43,19 @@ router.get('/:id', async (req, res) => {
 // PUT update customer
 router.put('/:id', async (req, res) => {
   try {
-    const customer = await Customer.findById(req.params.id);
+    const customer = await Customer.findByPk(req.params.id);
     if (!customer) {
       return res.status(404).json({ message: 'Customer not found' });
     }
 
-    if (req.body.name) customer.name = req.body.name;
-    if (req.body.phone) customer.phone = req.body.phone;
-    if (req.body.email) customer.email = req.body.email;
-    if (req.body.address) customer.address = req.body.address;
-    if (req.body.pets) customer.pets = req.body.pets;
+    await customer.update({
+      name: req.body.name !== undefined ? req.body.name : customer.name,
+      phone: req.body.phone !== undefined ? req.body.phone : customer.phone,
+      email: req.body.email !== undefined ? req.body.email : customer.email,
+      address: req.body.address !== undefined ? req.body.address : customer.address
+    });
 
-    const updatedCustomer = await customer.save();
-    res.json(updatedCustomer);
+    res.json(customer);
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
@@ -67,11 +64,11 @@ router.put('/:id', async (req, res) => {
 // DELETE customer
 router.delete('/:id', async (req, res) => {
   try {
-    const customer = await Customer.findById(req.params.id);
+    const customer = await Customer.findByPk(req.params.id);
     if (!customer) {
       return res.status(404).json({ message: 'Customer not found' });
     }
-    await customer.remove();
+    await customer.destroy();
     res.json({ message: 'Customer deleted' });
   } catch (err) {
     res.status(500).json({ message: err.message });

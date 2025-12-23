@@ -37,7 +37,7 @@ function SearchForm() {
 
     setLoading(true)
     try {
-      const response = await fetch(`http://localhost:5000/api/search?type=${searchType}&query=${encodeURIComponent(searchQuery)}`)
+      const response = await fetch(`http://localhost:8000/api/search?type=${searchType}&query=${encodeURIComponent(searchQuery)}`)
       if (response.ok) {
         const results = await response.json()
         setSearchResults(results)

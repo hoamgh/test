@@ -1,49 +1,54 @@
-const mongoose = require('mongoose');
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/database');
 
-const petSchema = new mongoose.Schema({
+const Pet = sequelize.define('Pet', {
+  id: {
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
+    primaryKey: true
+  },
   name: {
-    type: String,
-    required: true
+    type: DataTypes.STRING,
+    allowNull: false
   },
   type: {
-    type: String,
-    required: true,
-    enum: ['Chó', 'Mèo', 'Chim', 'Thỏ', 'Khác']
+    type: DataTypes.STRING,
+    allowNull: false,
+    validate: {
+      isIn: [['Chó', 'Mèo', 'Chim', 'Thỏ', 'Khác']]
+    }
   },
   breed: {
-    type: String
+    type: DataTypes.STRING
   },
   age: {
-    type: Number,
-    required: true
+    type: DataTypes.INTEGER,
+    allowNull: false
   },
   weight: {
-    type: Number
+    type: DataTypes.FLOAT
   },
   ownerName: {
-    type: String,
-    required: true
+    type: DataTypes.STRING,
+    allowNull: false
   },
   ownerPhone: {
-    type: String,
-    required: true
+    type: DataTypes.STRING,
+    allowNull: false
   },
   ownerEmail: {
-    type: String
+    type: DataTypes.STRING
   },
-  medicalHistory: [{
-    date: Date,
-    diagnosis: String,
-    treatment: String,
-    notes: String
-  }],
-  vaccinations: [{
-    vaccineName: String,
-    date: Date,
-    nextDueDate: Date
-  }]
+  medicalHistory: {
+    type: DataTypes.JSONB,
+    defaultValue: []
+  },
+  vaccinations: {
+    type: DataTypes.JSONB,
+    defaultValue: []
+  }
 }, {
   timestamps: true
 });
 
-module.exports = mongoose.model('Pet', petSchema);
+module.exports = Pet;

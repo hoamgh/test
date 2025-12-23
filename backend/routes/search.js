@@ -3,6 +3,7 @@ const router = express.Router();
 const Pet = require('../models/Pet');
 const Customer = require('../models/Customer');
 const Vaccine = require('../models/Vaccine');
+const { Op } = require('sequelize');
 
 // Search pets
 router.get('/pets', async (req, res) => {
@@ -12,14 +13,17 @@ router.get('/pets', async (req, res) => {
       return res.json([]);
     }
 
-    const pets = await Pet.find({
-      $or: [
-        { name: { $regex: q, $options: 'i' } },
-        { type: { $regex: q, $options: 'i' } },
-        { ownerName: { $regex: q, $options: 'i' } },
-        { ownerPhone: { $regex: q, $options: 'i' } }
-      ]
-    }).limit(20);
+    const pets = await Pet.findAll({
+      where: {
+        [Op.or]: [
+          { name: { [Op.iLike]: `%${q}%` } },
+          { type: { [Op.iLike]: `%${q}%` } },
+          { ownerName: { [Op.iLike]: `%${q}%` } },
+          { ownerPhone: { [Op.iLike]: `%${q}%` } }
+        ]
+      },
+      limit: 20
+    });
 
     res.json(pets);
   } catch (err) {
@@ -35,13 +39,16 @@ router.get('/customers', async (req, res) => {
       return res.json([]);
     }
 
-    const customers = await Customer.find({
-      $or: [
-        { name: { $regex: q, $options: 'i' } },
-        { phone: { $regex: q, $options: 'i' } },
-        { email: { $regex: q, $options: 'i' } }
-      ]
-    }).limit(20);
+    const customers = await Customer.findAll({
+      where: {
+        [Op.or]: [
+          { name: { [Op.iLike]: `%${q}%` } },
+          { phone: { [Op.iLike]: `%${q}%` } },
+          { email: { [Op.iLike]: `%${q}%` } }
+        ]
+      },
+      limit: 20
+    });
 
     res.json(customers);
   } catch (err) {
@@ -57,13 +64,16 @@ router.get('/vaccines', async (req, res) => {
       return res.json([]);
     }
 
-    const vaccines = await Vaccine.find({
-      $or: [
-        { name: { $regex: q, $options: 'i' } },
-        { type: { $regex: q, $options: 'i' } },
-        { description: { $regex: q, $options: 'i' } }
-      ]
-    }).limit(20);
+    const vaccines = await Vaccine.findAll({
+      where: {
+        [Op.or]: [
+          { name: { [Op.iLike]: `%${q}%` } },
+          { type: { [Op.iLike]: `%${q}%` } },
+          { description: { [Op.iLike]: `%${q}%` } }
+        ]
+      },
+      limit: 20
+    });
 
     res.json(vaccines);
   } catch (err) {
@@ -82,31 +92,40 @@ router.get('/', async (req, res) => {
     let results = { pets: [], customers: [], vaccines: [] };
 
     if (!type || type === 'pets') {
-      results.pets = await Pet.find({
-        $or: [
-          { name: { $regex: q, $options: 'i' } },
-          { type: { $regex: q, $options: 'i' } },
-          { ownerName: { $regex: q, $options: 'i' } }
-        ]
-      }).limit(10);
+      results.pets = await Pet.findAll({
+        where: {
+          [Op.or]: [
+            { name: { [Op.iLike]: `%${q}%` } },
+            { type: { [Op.iLike]: `%${q}%` } },
+            { ownerName: { [Op.iLike]: `%${q}%` } }
+          ]
+        },
+        limit: 10
+      });
     }
 
     if (!type || type === 'customers') {
-      results.customers = await Customer.find({
-        $or: [
-          { name: { $regex: q, $options: 'i' } },
-          { phone: { $regex: q, $options: 'i' } }
-        ]
-      }).limit(10);
+      results.customers = await Customer.findAll({
+        where: {
+          [Op.or]: [
+            { name: { [Op.iLike]: `%${q}%` } },
+            { phone: { [Op.iLike]: `%${q}%` } }
+          ]
+        },
+        limit: 10
+      });
     }
 
     if (!type || type === 'vaccines') {
-      results.vaccines = await Vaccine.find({
-        $or: [
-          { name: { $regex: q, $options: 'i' } },
-          { type: { $regex: q, $options: 'i' } }
-        ]
-      }).limit(10);
+      results.vaccines = await Vaccine.findAll({
+        where: {
+          [Op.or]: [
+            { name: { [Op.iLike]: `%${q}%` } },
+            { type: { [Op.iLike]: `%${q}%` } }
+          ]
+        },
+        limit: 10
+      });
     }
 
     res.json(results);
