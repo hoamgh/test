@@ -46,6 +46,7 @@ Backend sẽ chạy trên http://localhost:8000
 - `/api/pets` - Quản lý thú cưng
 - `/api/customers` - Quản lý khách hàng
 - `/api/vaccines` - Quản lý vaccine
+- `/api/products` - Quản lý sản phẩm
 
 ## Frontend Integration
 Frontend đã được cập nhật để gọi API từ port 8000. Ví dụ trong AppointmentForm:
